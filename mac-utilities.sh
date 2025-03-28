@@ -11,21 +11,21 @@ NC='\033[0m' # No Color
 confirm_install() {
     local tool=$1
     local description=$2
-    
+
     echo -e "\n${BLUE}==== $tool ====${NC}"
     echo -e "${YELLOW}Description:${NC} $description"
-    
+
     while true; do
         read -p "Do you want to install $tool? (y/n): " yn
         case $yn in
-            [Yy]* ) return 0;;
-            [Nn]* ) echo -e "${YELLOW}Skipping $tool...${NC}"; return 1;;
-            * ) echo "Please answer yes (y) or no (n).";;
+            [Yy]* ) return 0;; # User confirmed installation
+            [Nn]* ) echo -e "${YELLOW}Skipping $tool...${NC}"; return 1;; # User skipped installation
+            * ) echo "Please answer yes (y) or no (n).";; # Invalid input
         esac
     done
 }
 
-# Check if Homebrew is installed
+# Function to check if Homebrew is installed
 check_brew() {
     if ! command -v brew &> /dev/null; then
         echo -e "${YELLOW}Homebrew is not installed. Installing Homebrew first...${NC}"
@@ -49,17 +49,16 @@ main() {
     echo -e "${YELLOW}This script will help you install basic utilities on your Mac.${NC}"
     echo -e "${YELLOW}You will be prompted before each installation.${NC}"
     echo ""
-    
+
     # Check and install Homebrew first
     check_brew
-    
+
     # Update Homebrew
     echo -e "\n${YELLOW}Updating Homebrew...${NC}"
     brew update
-    
+
     # List of utilities with descriptions
-    declare -A utilities
-    utilities=(
+    declare -A utilities=(
         ["git"]="Distributed version control system"
         ["wget"]="Internet file retriever"
         ["curl"]="Command line tool for transferring data with URL syntax"
@@ -79,8 +78,9 @@ main() {
         ["google-chrome"]="Web browser"
         ["firefox"]="Web browser"
     )
-    
+
     # Install command-line utilities
+    echo -e "\n${BLUE}Installing Command-Line Utilities...${NC}"
     for tool in git wget curl htop tree jq tldr python node vim; do
         if confirm_install "$tool" "${utilities[$tool]}"; then
             echo -e "${YELLOW}Installing $tool...${NC}"
@@ -88,8 +88,9 @@ main() {
             echo -e "${GREEN}$tool installed successfully!${NC}"
         fi
     done
-    
+
     # Install GUI applications
+    echo -e "\n${BLUE}Installing GUI Applications...${NC}"
     for app in rectangle iterm2 visual-studio-code alfred the-unarchiver spotify google-chrome firefox; do
         if confirm_install "$app" "${utilities[$app]}"; then
             echo -e "${YELLOW}Installing $app...${NC}"
@@ -97,7 +98,7 @@ main() {
             echo -e "${GREEN}$app installed successfully!${NC}"
         fi
     done
-    
+
     echo -e "\n${GREEN}Installation process completed!${NC}"
     echo -e "${YELLOW}Remember to restart your terminal or run 'source ~/.zshrc' or 'source ~/.bash_profile' to apply changes.${NC}"
 }
